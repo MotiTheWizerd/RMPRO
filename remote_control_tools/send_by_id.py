@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+import sys
+import os
+
+# Add the project root to the path so we can import ir_manager
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 from ir_manager import IRManager
 from rich.console import Console
 import sys
@@ -7,18 +12,31 @@ import os
 
 console = Console()
 
-def send_signal_by_id(signal_id):
-    """Send an IR signal using its UUID"""
+def send_signal_by_id(signal_id, silent=False):
+    """Send an IR signal using its UUID
+    
+    Args:
+        signal_id: The UUID of the signal to send
+        silent: If True, don't print status messages
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
     ir_manager = IRManager()
     
-    with console.status(f"[bold blue]Sending signal with ID: {signal_id}...[/bold blue]"):
+    if not silent:
+        with console.status(f"[bold blue]Sending signal with ID: {signal_id}...[/bold blue]"):
+            success, message = ir_manager.send_signal_by_id(signal_id)
+    else:
         success, message = ir_manager.send_signal_by_id(signal_id)
     
     if success:
-        console.print(f"[bold green]✅ {message}[/bold green]")
+        if not silent:
+            console.print(f"[bold green]✅ {message}[/bold green]")
         return True
     else:
-        console.print(f"[bold red]❌ {message}[/bold red]")
+        if not silent:
+            console.print(f"[bold red]❌ {message}[/bold red]")
         return False
 
 def list_all_signals():
